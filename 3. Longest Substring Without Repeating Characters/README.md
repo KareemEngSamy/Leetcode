@@ -56,9 +56,6 @@ We maintain a **sliding window** (two pointers `l` and `r`) over the string:
 
 ## Code (C++)
 ```cpp
-#include <unordered_set>
-using namespace std;
-
 class Solution {
 public:
     int lengthOfLongestSubstring(string s) {
