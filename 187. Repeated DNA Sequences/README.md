@@ -16,44 +16,43 @@ The answer can be returned in any order.
 1 <= s.length <= 10⁵
 `s[i]` is one of `'A'`, `'C'`, `'G'`, `'T'`
 
-## 💡 Approach: Sliding Window + Hash Sets
+## 💡 Approach: Sliding Window + Hash Map
 
 ## Key Idea:
 
-We move a **sliding window** of length 10 along the string and track each 10-letter substring.
+We use a **hash map** to store and count all 10-letter substrings.
 
-* Use a set `seen` to store substrings that appear once.
-* Use another set `repeated` to store substrings that appear more than once.
-* Convert the `repeated` set to a vector for the final answer.
+* The key is the substring itself.
+* The value is the number of times it appears.
+  After counting, any substring that appears **more than once** is added to the result vector.
 
 ## Why It Works:
 
-* Every substring of length 10 is checked exactly once.
-* Sets provide **O(1)** average time for insert and lookup.
-* Duplicates are automatically filtered by moving from `seen` to `repeated`.
-* The algorithm efficiently handles large strings because it uses constant extra space per unique substring.
+* Each substring of length 10 is processed exactly once.
+* Hash maps provide **O(1)** average time for insert and lookup operations.
+* Counting occurrences ensures we detect all repeated sequences precisely.
+* Efficient for long DNA strings due to single linear traversal.
 
-## Example Walkthrough 
+## Example Walkthrough
+
 ### `(s = "AAAAACCCCCAAAAACCCCCCAAAAAGGGTTT")`
 
-1. Scan all 10-character substrings.
-
-   * First `"AAAAACCCCC"` → add to `seen`.
-   * Next `"AAAACCCCCA"` → add to `seen`.
-   * Continue until `"AAAAACCCCC"` repeats → move it to `repeated`.
-   * `"CCCCCAAAAA"` also repeats later → move it to `repeated`.
-2. After scanning the entire string, `repeated = {"AAAAACCCCC", "CCCCCAAAAA"}`.
+1. Traverse the string using a sliding window of length 10.
+2. `"AAAAACCCCC"` appears twice.
+3. `"CCCCCAAAAA"` appears twice.
+4. All other substrings appear once.
 
 **Result:** `["AAAAACCCCC", "CCCCCAAAAA"]`
 
 ## Complexity
 
-### **Time Complexity: O(n)** 
-* Each substring processed once  
-* O(1) is the average lookup per set.
+### **Time Complexity: O(n)**
 
-### **Space Complexity: O(n)** 
-* At most O(n) substrings stored across both sets.
+Each 10-letter substring is processed once and stored or updated in O(1) average time.
+
+### **Space Complexity: O(n)**
+
+Up to O(n) unique substrings stored in the hash map.
 
 ## Code (C++)
 
@@ -61,19 +60,18 @@ We move a **sliding window** of length 10 along the string and track each 10-let
 class Solution {
 public:
     vector<string> findRepeatedDnaSequences(string s) {
-        unordered_set<string> seen, repeated;
+        unordered_map<string, int> count;
         vector<string> result;
 
         for (int i = 0; i + 9 < s.size(); i++) {
             string sub = s.substr(i, 10);
-            if (seen.count(sub))
-                repeated.insert(sub);
-            else
-                seen.insert(sub);
+            count[sub]++;
         }
 
-        for (const string& seq : repeated)
-            result.push_back(seq);
+        for (auto& [sub, freq] : count) {
+            if (freq > 1)
+                result.push_back(sub);
+        }
 
         return result;
     }
